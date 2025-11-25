@@ -1,0 +1,53 @@
+#!/usr/bin/python
+import sys
+
+USAGE_INFO:str = """
+    usage: ./assembler [file_name].asm
+"""
+UNRECOGNIZED_ARGUMENTS_ERROR = """
+    Could not parse line, invalid number of arguments passed to opcode.
+"""
+INVALID_FORMAT_ERROR = """
+    Only .asm extensions are allowed
+"""
+
+OP_CODES:dict[str,int] = {
+    'ADD':0x00,
+    'SUB':0x01,
+    'JMP':0x02,
+    'STO':0x03,
+    'LOD':0x04,
+    'JPZ':0x05,
+    'JNZ':0x06,
+    'HALT':0xff
+}
+
+def hex_to_bin_string(hex_num):
+    return f'{int(hex_num,16):08b}'
+
+def parse_line(line:str) -> list[str]:
+    tokens = list(filter(lambda l: l != '',line.strip().split(';')[0].split(' ')))
+    assert len(tokens) == 2, f'error: {UNRECOGNIZED_ARGUMENTS_ERROR}:'
+
+    opcode:int= OP_CODES[tokens[0]]
+    tokens[0] = str(opcode)
+    return tokens 
+
+def main(argv:list[str]) -> None:
+    assert len(argv) == 2, USAGE_INFO
+    file_name:str = argv[1]
+    assert file_name.split('.')[-1] == 'asm', INVALID_FORMAT_ERROR
+
+    source:list[str] = [] 
+    with open(file_name,'r') as f:
+       source = f.readlines()
+
+    program_path: str = file_name.split('.asm')[0] + '.o'
+
+    with open(program_path,'w') as f:
+        program: list[str] = [hex_to_bin_string(t) for l in map(parse_line,source) for t in l]
+        program.append(hex_to_bin_string(OP_CODES['HALT']))
+        f.writelines(program)
+
+if __name__ == '__main__':
+    main(sys.argv)
