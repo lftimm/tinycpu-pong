@@ -4,10 +4,10 @@ import sys
 USAGE_INFO:str = """
     usage: ./assembler [file_name].asm
 """
-UNRECOGNIZED_ARGUMENTS_ERROR = """
+UNRECOGNIZED_ARGUMENTS_ERROR:str = """
     Could not parse line, invalid number of arguments passed to opcode.
 """
-INVALID_FORMAT_ERROR = """
+INVALID_FORMAT_ERROR:str = """
     Only .asm extensions are allowed
 """
 
@@ -22,7 +22,7 @@ OP_CODES:dict[str,int] = {
     'HALT':0xff
 }
 
-def hex_to_bin_string(hex_num):
+def hex_to_bin_string(hex_num) -> str:
     return f'{int(hex_num,16):08b}'
 
 def parse_line(line:str) -> list[str]:
@@ -31,7 +31,7 @@ def parse_line(line:str) -> list[str]:
 
     opcode:int= OP_CODES[tokens[0]]
     tokens[0] = str(opcode)
-    return tokens 
+    return tokens
 
 def main(argv:list[str]) -> None:
     assert len(argv) == 2, USAGE_INFO
@@ -46,8 +46,8 @@ def main(argv:list[str]) -> None:
 
     with open(program_path,'w') as f:
         program: list[str] = [hex_to_bin_string(t) for l in map(parse_line,source) for t in l]
-        program.append(hex_to_bin_string(OP_CODES['HALT']))
-        f.writelines(program)
+        f.writelines('\n'.join(program))
+        f.write('\n11111111')
 
 if __name__ == '__main__':
     main(sys.argv)

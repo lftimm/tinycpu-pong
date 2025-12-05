@@ -1,9 +1,12 @@
 #pragma once
+#include <array>
 #include <cassert>
+#include <string_view>
+#include <vector>
 
-using byte = unsigned char;
 
 namespace TinyCpu {
+    using byte = unsigned char;
     constexpr byte MemorySize = 255;
 
     enum OpCodes {
@@ -17,15 +20,19 @@ namespace TinyCpu {
         HALT=0xff,
     };
 
-    struct CPU {
-        byte Memory[MemorySize];
+    class CPU {
+        std::array<byte, MemorySize> Memory{};
 
         byte PC{0x00};
         byte ACC{0x00};
         byte IR{HALT};
 
-        void run();
         void fetch();
         void execute();
+
+    public:
+        void load_program(const std::string& file_path);
+        void run();
+        void dump();
     };
 }
